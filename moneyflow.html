@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MoneyFlow</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f0eb; --surface:#fdfaf7; --s2:#f0ebe3; --bdr:#ddd5c8;
+  --tx:#2e2a25; --tx2:#6b6156; --tx3:#9e9084;
+  --inc:#2d7a5f; --inc-bg:#e6f4ef; --inc-bdr:#a8d9c6;
+  --exp:#b84040; --exp-bg:#fceaea; --exp-bdr:#f0b8b8;
+  --onl:#1a5fa0; --onl-bg:#e6f0fa; --onl-bdr:#9daae0;
+  --off:#7a4f1e; --off-bg:#fdf3e3; --off-bdr:#e8c47a;
+  --lend:#1a6b5a;   --lend-bg:#e4f5f1;   --lend-bdr:#7ecabb;
+  --borrow:#5a3aaa; --borrow-bg:#eeebfa; --borrow-bdr:#b8a8e8;
+  --gold:#c08a2e; --gold-bg:#fdf3de;
+  --r:16px; --rs:10px; --ease:.2s cubic-bezier(.4,0,.2,1);
+}
+body{background:var(--bg);color:var(--tx);font-family:'Nunito',sans-serif;min-height:100vh}
+.wrap{max-width:560px;margin:0 auto;padding:28px 16px 80px}
+
+header{text-align:center;margin-bottom:22px}
+.logo{width:50px;height:50px;background:var(--surface);border:1.5px solid var(--bdr);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:8px;box-shadow:0 2px 8px rgba(100,80,60,.08)}
+h1{font-family:'Lora',serif;font-size:1.6rem;font-weight:600}
+h1 em{color:var(--inc);font-style:italic}
+.sub{color:var(--tx3);font-size:.74rem;margin-top:3px}
+
+.notice{background:var(--gold-bg);border:1px solid #e8c97a;border-radius:var(--rs);padding:10px 14px;margin-bottom:16px;font-size:.71rem;color:var(--gold);line-height:1.6}
+.notice code{background:rgba(192,138,46,.12);padding:1px 5px;border-radius:4px;font-family:monospace}
+
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:16px}
+.sc{background:var(--surface);border:1.5px solid var(--bdr);border-radius:var(--rs);padding:10px 7px;text-align:center}
+.sc-l{font-size:.57rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:3px}
+.sc-v{font-family:'Lora',serif;font-size:.92rem;font-weight:600}
+#sv-bal{color:var(--inc)} #sv-inc{color:var(--inc)} #sv-exp{color:var(--exp)}
+
+.card{background:var(--surface);border:1.5px solid var(--bdr);border-radius:var(--r);padding:20px 18px;box-shadow:0 2px 10px rgba(100,80,60,.07)}
+.ch{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.ch-ico{width:28px;height:28px;background:var(--inc-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.ch h2{font-family:'Lora',serif;font-size:.98rem;font-weight:600}
+
+.tabs{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--s2);border:1.5px solid var(--bdr);border-radius:11px;padding:3px;gap:3px;margin-bottom:13px}
+.tb{padding:9px 4px;border:1.5px solid transparent;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.79rem;cursor:pointer;color:var(--tx3);background:transparent;transition:var(--ease)}
+.tb.income.on {background:var(--inc-bg); color:var(--inc);    border-color:var(--inc-bdr)}
+.tb.expense.on{background:var(--exp-bg); color:var(--exp);    border-color:var(--exp-bdr)}
+.tb.debt.on   {background:var(--lend-bg);color:var(--lend);   border-color:var(--lend-bdr)}
+
+.mode-row{display:none;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:13px}
+.mode-row.show{display:grid}
+.mb{padding:9px 8px;border-radius:9px;border:1.5px solid var(--bdr);background:var(--s2);cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:.78rem;color:var(--tx3);transition:var(--ease);display:flex;flex-direction:column;align-items:center;gap:2px}
+.mb .mi{font-size:16px} .mb .mh{font-size:.6rem;opacity:.7;font-weight:600}
+.mb.online.on {background:var(--onl-bg);border-color:var(--onl-bdr);color:var(--onl)}
+.mb.offline.on{background:var(--off-bg);border-color:var(--off-bdr);color:var(--off)}
+
+/* ── DEBT ── */
+.debt-section{display:none;margin-bottom:13px}
+.debt-section.show{display:block}
+.flow-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--tx2);margin-bottom:7px}
+.flow-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.flow-card{border:2px solid var(--bdr);border-radius:12px;padding:12px 10px;cursor:pointer;background:var(--s2);transition:var(--ease);text-align:center}
+.flow-card.lend.on  {background:var(--lend-bg);  border-color:var(--lend-bdr)}
+.flow-card.borrow.on{background:var(--borrow-bg);border-color:var(--borrow-bdr)}
+.fc-emoji{font-size:22px;margin-bottom:5px}
+.fc-title{font-size:.82rem;font-weight:800;color:var(--tx);margin-bottom:2px}
+.fc-desc{font-size:.65rem;font-weight:600;color:var(--tx3);line-height:1.4}
+.flow-card.lend.on   .fc-title{color:var(--lend)}
+.flow-card.borrow.on .fc-title{color:var(--borrow)}
+
+.action-row{display:none;margin-bottom:4px}
+.action-row.show{display:block}
+.action-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--tx2);margin-bottom:7px}
+.action-btns{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ab{border:1.5px solid var(--bdr);border-radius:10px;padding:10px 9px;cursor:pointer;background:var(--s2);transition:var(--ease);font-family:'Nunito',sans-serif;font-weight:700;font-size:.77rem;color:var(--tx3);display:flex;flex-direction:column;align-items:center;gap:3px}
+.ab .ab-ico{font-size:15px}
+.ab .ab-lbl{font-size:.78rem;font-weight:800;color:var(--tx)}
+.ab .ab-sub{font-size:.62rem;font-weight:600;opacity:.75;text-align:center;line-height:1.35}
+.action-row.lend   .ab.on{background:var(--lend-bg);  border-color:var(--lend-bdr);  color:var(--lend)}
+.action-row.lend   .ab.on .ab-lbl{color:var(--lend)}
+.action-row.borrow .ab.on{background:var(--borrow-bg);border-color:var(--borrow-bdr);color:var(--borrow)}
+.action-row.borrow .ab.on .ab-lbl{color:var(--borrow)}
+
+/* ── PERSON BALANCE PANEL ── */
+.person-balance{
+  display:none;
+  border-radius:12px;padding:14px 14px 12px;margin-top:11px;
+  border:1.5px solid var(--lend-bdr);background:var(--lend-bg);
+}
+.person-balance.show{display:block}
+.person-balance.borrow-mode{border-color:var(--borrow-bdr);background:var(--borrow-bg)}
+
+.pb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.pb-name{font-size:.82rem;font-weight:800;color:var(--tx)}
+.pb-badge{font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:20px}
+.pb-badge.lend  {background:var(--lend-bdr);  color:var(--lend)}
+.pb-badge.borrow{background:var(--borrow-bdr);color:var(--borrow)}
+
+.pb-rows{display:flex;flex-direction:column;gap:5px}
+.pb-row{display:flex;justify-content:space-between;align-items:center;font-size:.75rem}
+.pb-row-label{color:var(--tx3);font-weight:600}
+.pb-row-val{font-family:'Lora',serif;font-weight:600;font-size:.82rem}
+.pb-row-val.lend  {color:var(--lend)}
+.pb-row-val.borrow{color:var(--borrow)}
+.pb-row-val.settled{color:var(--tx3)}
+
+.pb-divider{height:1px;background:var(--bdr);margin:6px 0}
+
+.pb-balance-row{display:flex;justify-content:space-between;align-items:center}
+.pb-balance-label{font-size:.75rem;font-weight:800;color:var(--tx)}
+.pb-balance-val{font-family:'Lora',serif;font-size:1rem;font-weight:600}
+.pb-balance-val.lend  {color:var(--lend)}
+.pb-balance-val.borrow{color:var(--borrow)}
+.pb-balance-val.settled{color:var(--inc);font-size:.85rem}
+
+.pb-settled-banner{
+  margin-top:8px;padding:6px 10px;border-radius:8px;
+  background:var(--inc-bg);border:1px solid var(--inc-bdr);
+  font-size:.7rem;font-weight:700;color:var(--inc);text-align:center;
+}
+
+/* ── DEBT LEDGER (per person tracker below form) ── */
+.ledger-section{margin-top:20px}
+.ledger-head{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--tx3);margin-bottom:8px}
+.ledger-list{display:flex;flex-direction:column;gap:7px}
+
+.ledger-card{background:var(--surface);border:1.5px solid var(--bdr);border-radius:12px;padding:12px 14px}
+.lc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.lc-person{font-size:.85rem;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:6px}
+.lc-person .lc-ico{font-size:14px}
+.lc-type-badge{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:20px}
+.lc-type-badge.lend  {background:var(--lend-bg);  color:var(--lend);  border:1px solid var(--lend-bdr)}
+.lc-type-badge.borrow{background:var(--borrow-bg);color:var(--borrow);border:1px solid var(--borrow-bdr)}
+
+.lc-bars{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.lc-bar{text-align:center;padding:7px 4px;border-radius:8px;background:var(--s2)}
+.lc-bar-lbl{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3);margin-bottom:3px}
+.lc-bar-val{font-family:'Lora',serif;font-size:.85rem;font-weight:600}
+.lc-bar-val.lend  {color:var(--lend)}
+.lc-bar-val.borrow{color:var(--borrow)}
+.lc-bar-val.neutral{color:var(--tx3)}
+.lc-bar-val.settled{color:var(--inc)}
+
+.lc-settled{margin-top:7px;font-size:.68rem;font-weight:700;color:var(--inc);text-align:center;padding:4px;background:var(--inc-bg);border-radius:6px}
+
+/* ── FIELDS ── */
+.field{margin-bottom:12px}
+.field label{display:block;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--tx2);margin-bottom:5px}
+.ipw{position:relative}
+.pfx{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-family:'Lora',serif;font-size:.92rem;color:var(--tx3);pointer-events:none}
+input[type=number],input[type=text],input[type=datetime-local],select{
+  width:100%;background:var(--s2);border:1.5px solid var(--bdr);border-radius:var(--rs);
+  padding:10px 12px;color:var(--tx);font-family:'Nunito',sans-serif;font-size:.87rem;font-weight:600;
+  outline:none;transition:var(--ease);-webkit-appearance:none;appearance:none
+}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239e9084' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px}
+input.pl{padding-left:24px}
+input[type=number]::-webkit-inner-spin-button{display:none}
+input:focus,select:focus{border-color:var(--inc);background:var(--surface);box-shadow:0 0 0 3px rgba(45,122,95,.11)}
+input::placeholder{color:var(--tx3);font-weight:500}
+.hid{display:none}.hid.show{display:block}
+
+.sbtn{width:100%;margin-top:8px;padding:13px;border:none;border-radius:11px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.9rem;cursor:pointer;transition:var(--ease);position:relative;overflow:hidden}
+.sbtn.inc-m  {background:var(--inc);   color:#fff}
+.sbtn.exp-m  {background:var(--exp);   color:#fff}
+.sbtn.lend-m {background:var(--lend);  color:#fff}
+.sbtn.bor-m  {background:var(--borrow);color:#fff}
+.sbtn:hover{opacity:.88;transform:translateY(-1px)}
+.sbtn:active{transform:none;opacity:1}
+.sbtn.loading{pointer-events:none;opacity:.6}
+.sbtn.loading .bt{opacity:0}
+.sbtn.loading .sp{display:flex}
+.sp{display:none;position:absolute;inset:0;align-items:center;justify-content:center}
+.ring{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+
+.log-sec{margin-top:18px}
+.log-hd{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--tx3);margin-bottom:8px}
+.log-list{display:flex;flex-direction:column;gap:6px}
+.empty{text-align:center;color:var(--tx3);font-size:.76rem;padding:20px 0;font-style:italic}
+.li{background:var(--surface);border:1.5px solid var(--bdr);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:9px}
+.lp{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.lp.inc{background:var(--inc-bg)} .lp.exp{background:var(--exp-bg)}
+.lp.lend{background:var(--lend-bg)} .lp.borrow{background:var(--borrow-bg)}
+.li-info{flex:1;min-width:0}
+.li-desc{font-size:.81rem;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li-meta{font-size:.63rem;color:var(--tx3);margin-top:2px;font-weight:500}
+.li-r{text-align:right;flex-shrink:0}
+.li-amt{font-family:'Lora',serif;font-size:.88rem;font-weight:600;display:block}
+.li-amt.inc{color:var(--inc)} .li-amt.exp{color:var(--exp)}
+.li-amt.lend{color:var(--lend)} .li-amt.borrow{color:var(--borrow)}
+.li-tags{display:flex;gap:3px;justify-content:flex-end;margin-top:3px}
+.tag{font-size:.56rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:2px 5px;border-radius:4px}
+.tag.onl {background:var(--onl-bg); color:var(--onl)}
+.tag.off {background:var(--off-bg); color:var(--off)}
+.tag.lend-gave   {background:var(--lend-bg);   color:var(--lend)}
+.tag.lend-got    {background:var(--lend-bg);   color:var(--lend)}
+.tag.bor-took    {background:var(--borrow-bg); color:var(--borrow)}
+.tag.bor-returned{background:var(--borrow-bg); color:var(--borrow)}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--surface);border:1.5px solid var(--bdr);border-radius:50px;padding:10px 18px;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.34,1.56,.64,1);z-index:99;white-space:nowrap;box-shadow:0 4px 14px rgba(100,80,60,.12)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok {border-color:var(--inc-bdr);color:var(--inc)}
+.toast.err{border-color:var(--exp-bdr);color:var(--exp)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="logo">🪙</div>
+  <h1>Money<em>Flow</em></h1>
+  <p class="sub">Income · Expense · Debt tracker</p>
+</header>
+
+<div class="notice">
+  <strong>⚙ Setup:</strong> Replace <code>YOUR_APPS_SCRIPT_URL</code> with your Google Apps Script Web App URL. See <code>appsscript.gs</code> for step-by-step instructions.
+</div>
+
+<div class="summary">
+  <div class="sc"><div class="sc-l">Balance</div><div class="sc-v" id="sv-bal">₹0</div></div>
+  <div class="sc"><div class="sc-l">Income</div> <div class="sc-v" id="sv-inc">₹0</div></div>
+  <div class="sc"><div class="sc-l">Expense</div><div class="sc-v" id="sv-exp">₹0</div></div>
+  <div class="sc"><div class="sc-l">Net Debt</div><div class="sc-v" id="sv-debt">₹0</div></div>
+</div>
+
+<div class="card">
+  <div class="ch"><div class="ch-ico">✏️</div><h2>New entry</h2></div>
+
+  <div class="tabs">
+    <button class="tb income on"  onclick="setType('income')">↑ Income</button>
+    <button class="tb expense"    onclick="setType('expense')">↓ Expense</button>
+    <button class="tb debt"       onclick="setType('debt')">⇄ Debt</button>
+  </div>
+
+  <!-- ONLINE / OFFLINE -->
+  <div class="mode-row show" id="mode-row">
+    <button class="mb online on" id="mb-online"  onclick="setMode('online')">
+      <span class="mi">📲</span><span>Online</span><span class="mh">UPI · Net banking</span>
+    </button>
+    <button class="mb offline"   id="mb-offline" onclick="setMode('offline')">
+      <span class="mi">💵</span><span>Offline</span><span class="mh">Cash · ATM</span>
+    </button>
+  </div>
+
+  <!-- DEBT SECTION -->
+  <div class="debt-section" id="debt-sec">
+
+    <div class="flow-label">Which situation?</div>
+    <div class="flow-cards">
+      <div class="flow-card lend on" id="fc-lend" onclick="setFlow('lend')">
+        <div class="fc-emoji">🫴</div>
+        <div class="fc-title">I lend money</div>
+        <div class="fc-desc">I give money to someone &amp; they return later</div>
+      </div>
+      <div class="flow-card borrow" id="fc-borrow" onclick="setFlow('borrow')">
+        <div class="fc-emoji">🤲</div>
+        <div class="fc-title">I borrow money</div>
+        <div class="fc-desc">I take money from someone &amp; return later</div>
+      </div>
+    </div>
+
+    <!-- Lend actions -->
+    <div class="action-row lend show" id="ar-lend">
+      <div class="action-label">What happened today?</div>
+      <div class="action-btns">
+        <button class="ab on" id="ab-lend-give" onclick="setAction('lend-give')">
+          <span class="ab-ico">💸</span>
+          <span class="ab-lbl">Gave money</span>
+          <span class="ab-sub">I gave money to someone now</span>
+        </button>
+        <button class="ab" id="ab-lend-got" onclick="setAction('lend-got')">
+          <span class="ab-ico">✅</span>
+          <span class="ab-lbl">Got it back</span>
+          <span class="ab-sub">They returned my money</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Borrow actions -->
+    <div class="action-row borrow" id="ar-borrow">
+      <div class="action-label">What happened today?</div>
+      <div class="action-btns">
+        <button class="ab" id="ab-borrow-took" onclick="setAction('borrow-took')">
+          <span class="ab-ico">🤝</span>
+          <span class="ab-lbl">Took money</span>
+          <span class="ab-sub">I received money from someone</span>
+        </button>
+        <button class="ab" id="ab-borrow-returned" onclick="setAction('borrow-returned')">
+          <span class="ab-ico">🔄</span>
+          <span class="ab-lbl">Returned it</span>
+          <span class="ab-sub">I paid back the money I owed</span>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /debt-section -->
+
+  <!-- AMOUNT -->
+  <div class="field">
+    <label>Amount</label>
+    <div class="ipw"><span class="pfx">₹</span>
+      <input type="number" id="amount" class="pl" placeholder="0.00" min="0" step="0.01"/>
+    </div>
+  </div>
+
+  <!-- PERSON (debt only) -->
+  <div class="field hid" id="person-field">
+    <label id="person-lbl">Person name</label>
+    <input type="text" id="person" placeholder="Enter name" oninput="onPersonInput()"/>
+  </div>
+
+  <!-- PERSON BALANCE PANEL — shown live after person typed -->
+  <div class="person-balance" id="person-balance">
+    <div class="pb-head">
+      <span class="pb-name" id="pb-name">—</span>
+      <span class="pb-badge" id="pb-badge">lend</span>
+    </div>
+    <div class="pb-rows">
+      <div class="pb-row">
+        <span class="pb-row-label" id="pb-lbl-total">Total given</span>
+        <span class="pb-row-val" id="pb-total">₹0</span>
+      </div>
+      <div class="pb-row">
+        <span class="pb-row-label" id="pb-lbl-paid">Returned so far</span>
+        <span class="pb-row-val" id="pb-paid">₹0</span>
+      </div>
+      <div class="pb-divider"></div>
+      <div class="pb-balance-row">
+        <span class="pb-balance-label" id="pb-lbl-balance">Still to receive</span>
+        <span class="pb-balance-val" id="pb-balance-val">₹0</span>
+      </div>
+    </div>
+    <div class="pb-settled-banner" id="pb-settled" style="display:none">🎉 All settled up!</div>
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="field">
+    <label>Description</label>
+    <input type="text" id="desc" placeholder="e.g. Salary, Groceries, Petrol…"/>
+  </div>
+
+  <!-- SOURCE -->
+  <div class="field">
+    <label id="src-lbl">Payment via</label>
+    <select id="src-sel" onchange="onSrcChange()"></select>
+  </div>
+
+  <div class="field hid" id="other-field">
+    <label>Specify name</label>
+    <input type="text" id="other-val" placeholder="e.g. Kotak, Juspay, Navi…"/>
+  </div>
+
+  <div class="field">
+    <label>Date &amp; Time</label>
+    <input type="datetime-local" id="ts"/>
+  </div>
+
+  <button class="sbtn inc-m" id="sbtn" onclick="save()">
+    <span class="bt" id="sbtn-lbl">Save income →</span>
+    <span class="sp"><span class="ring"></span></span>
+  </button>
+</div><!-- /card -->
+
+<!-- DEBT LEDGER — per person running balance -->
+<div class="ledger-section" id="ledger-section" style="display:none">
+  <div class="ledger-head">Debt tracker — per person</div>
+  <div class="ledger-list" id="ledger-list"></div>
+</div>
+
+<!-- RECENT LOG -->
+<div class="log-sec">
+  <div class="log-hd">Recent entries (this session)</div>
+  <div class="log-list" id="log-list">
+    <div class="empty">No entries yet — add your first one above 🌿</div>
+  </div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL';
+
+const ONLINE  = ['GPay','PhonePe','Paytm','ICICI Net Banking','HDFC Net Banking','SBI Net Banking','IOB Net Banking','TMB Net Banking','Amazon Pay','BHIM UPI','Other (online)'];
+const OFFLINE = ['Cash in hand','ICICI ATM','IOB ATM','TMB ATM','HDFC ATM','SBI ATM','Cheque','Other (offline)'];
+const DEBT_VIA= ['Cash','GPay','PhonePe','Paytm','ICICI Bank','IOB','TMB','HDFC Bank','SBI','Other'];
+
+let cType   = 'income';
+let cMode   = 'online';
+let cFlow   = 'lend';
+let cAction = 'lend-give';
+let entries = [];
+
+// personLedger[name] = { flow:'lend'|'borrow', given:0, returned:0 }
+let personLedger = {};
+
+const _n = new Date(); _n.setMinutes(_n.getMinutes()-_n.getTimezoneOffset());
+document.getElementById('ts').value = _n.toISOString().slice(0,16);
+fillSrc(); refreshBtn();
+
+/* ── TYPE ── */
+function setType(t){
+  cType = t;
+  document.querySelectorAll('.tb').forEach(b=>b.classList.toggle('on',b.classList.contains(t)));
+  const isDebt = t==='debt';
+  tog('mode-row',    !isDebt);
+  tog('debt-sec',     isDebt);
+  tog('person-field', isDebt);
+  if(!isDebt) document.getElementById('person-balance').classList.remove('show');
+  fillSrc(); refreshBtn();
+}
+
+/* ── MODE ── */
+function setMode(m){
+  cMode = m;
+  document.getElementById('mb-online').classList.toggle('on',  m==='online');
+  document.getElementById('mb-offline').classList.toggle('on', m==='offline');
+  fillSrc(); refreshBtn();
+}
+
+/* ── FLOW ── */
+function setFlow(f){
+  cFlow = f;
+  document.getElementById('fc-lend').classList.toggle('on',   f==='lend');
+  document.getElementById('fc-borrow').classList.toggle('on', f==='borrow');
+  document.getElementById('ar-lend').classList.toggle('show',   f==='lend');
+  document.getElementById('ar-borrow').classList.toggle('show', f==='borrow');
+  if(f==='lend') setAction('lend-give');
+  else           setAction('borrow-took');
+  onPersonInput(); // refresh balance panel for new flow
+}
+
+/* ── ACTION ── */
+function setAction(a){
+  cAction = a;
+  document.querySelectorAll('.ab').forEach(b=>b.classList.remove('on'));
+  const el = document.getElementById('ab-'+a);
+  if(el) el.classList.add('on');
+  const labels = {
+    'lend-give':      'Lent to (person name)',
+    'lend-got':       'Received back from',
+    'borrow-took':    'Borrowed from (person name)',
+    'borrow-returned':'Returned to (person name)'
+  };
+  document.getElementById('person-lbl').textContent = labels[a]||'Person name';
+  onPersonInput();
+  refreshBtn();
+}
+
+/* ── PERSON INPUT → show balance panel ── */
+function onPersonInput(){
+  const name = document.getElementById('person').value.trim();
+  const panel = document.getElementById('person-balance');
+
+  if(cType!=='debt' || !name){ panel.classList.remove('show'); return; }
+
+  const key = name.toLowerCase();
+  const ledger = personLedger[key];
+
+  // Show panel always when name typed (even if no history — shows ₹0)
+  panel.classList.add('show');
+  panel.classList.toggle('borrow-mode', cFlow==='borrow');
+
+  document.getElementById('pb-name').textContent = name;
+
+  const badge = document.getElementById('pb-badge');
+  badge.textContent = cFlow==='lend' ? 'You lent' : 'You borrowed';
+  badge.className = `pb-badge ${cFlow==='lend'?'lend':'borrow'}`;
+
+  const given    = ledger?.given    || 0;
+  const returned = ledger?.returned || 0;
+  const balance  = given - returned;
+  const settled  = balance <= 0;
+  const cls      = cFlow==='lend' ? 'lend' : 'borrow';
+
+  if(cFlow==='lend'){
+    document.getElementById('pb-lbl-total').textContent   = 'Total you gave';
+    document.getElementById('pb-lbl-paid').textContent    = 'They returned';
+    document.getElementById('pb-lbl-balance').textContent = settled ? 'Status' : 'Still to receive from them';
+  } else {
+    document.getElementById('pb-lbl-total').textContent   = 'Total you took';
+    document.getElementById('pb-lbl-paid').textContent    = 'You returned';
+    document.getElementById('pb-lbl-balance').textContent = settled ? 'Status' : 'Still to pay them';
+  }
+
+  document.getElementById('pb-total').textContent = fmt(given);
+  document.getElementById('pb-total').className   = `pb-row-val ${cls}`;
+  document.getElementById('pb-paid').textContent  = fmt(returned);
+  document.getElementById('pb-paid').className    = `pb-row-val ${cls}`;
+
+  const bv = document.getElementById('pb-balance-val');
+  const bs = document.getElementById('pb-settled');
+
+  if(settled && given > 0){
+    bv.textContent = 'Settled ✓';
+    bv.className   = 'pb-balance-val settled';
+    bs.style.display = 'block';
+  } else {
+    bv.textContent = fmt(Math.max(0, balance));
+    bv.className   = `pb-balance-val ${cls}`;
+    bs.style.display = 'none';
+  }
+}
+
+/* ── UPDATE LEDGER after save ── */
+function updateLedger(entry){
+  if(entry.type!=='debt' || !entry.person) return;
+  const key = entry.person.toLowerCase();
+  if(!personLedger[key]) personLedger[key] = { name:entry.person, flow:cFlow, given:0, returned:0 };
+
+  if(entry.action==='lend-give')        personLedger[key].given    += +entry.amount;
+  if(entry.action==='lend-got')         personLedger[key].returned += +entry.amount;
+  if(entry.action==='borrow-took')      personLedger[key].given    += +entry.amount;
+  if(entry.action==='borrow-returned')  personLedger[key].returned += +entry.amount;
+  personLedger[key].flow = cFlow;
+
+  renderLedger();
+}
+
+/* ── RENDER LEDGER CARDS ── */
+function renderLedger(){
+  const section = document.getElementById('ledger-section');
+  const list    = document.getElementById('ledger-list');
+  const people  = Object.values(personLedger);
+  if(!people.length){ section.style.display='none'; return; }
+
+  section.style.display = 'block';
+  list.innerHTML = '';
+
+  people.forEach(p=>{
+    const balance = p.given - p.returned;
+    const settled = balance <= 0 && p.given > 0;
+    const isLend  = p.flow === 'lend';
+    const cls     = isLend ? 'lend' : 'borrow';
+
+    const card = document.createElement('div');
+    card.className = 'ledger-card';
+    card.innerHTML = `
+      <div class="lc-top">
+        <span class="lc-person">
+          <span class="lc-ico">${isLend?'🫴':'🤲'}</span>
+          ${p.name}
+        </span>
+        <span class="lc-type-badge ${cls}">${isLend?'I lent':'I borrowed'}</span>
+      </div>
+      <div class="lc-bars">
+        <div class="lc-bar">
+          <div class="lc-bar-lbl">${isLend?'Given':'Took'}</div>
+          <div class="lc-bar-val ${cls}">${fmt(p.given)}</div>
+        </div>
+        <div class="lc-bar">
+          <div class="lc-bar-lbl">${isLend?'Got back':'Returned'}</div>
+          <div class="lc-bar-val ${cls}">${fmt(p.returned)}</div>
+        </div>
+        <div class="lc-bar">
+          <div class="lc-bar-lbl">Balance</div>
+          <div class="lc-bar-val ${settled?'settled':cls}">${settled?'✓ Clear':fmt(Math.max(0,balance))}</div>
+        </div>
+      </div>
+      ${settled ? '<div class="lc-settled">🎉 All settled up with '+p.name+'!</div>' : ''}
+    `;
+    list.appendChild(card);
+  });
+}
+
+/* ── SOURCE ── */
+function fillSrc(){
+  const sel = document.getElementById('src-sel');
+  const opts = cType==='debt' ? DEBT_VIA : (cMode==='online' ? ONLINE : OFFLINE);
+  sel.innerHTML = opts.map(o=>`<option value="${o}">${o}</option>`).join('');
+  const lbl = document.getElementById('src-lbl');
+  lbl.textContent = cType==='debt' ? 'Via (how money moved)' : cMode==='online' ? 'Online via' : 'Offline via';
+  onSrcChange();
+}
+function onSrcChange(){
+  const v = document.getElementById('src-sel').value.toLowerCase();
+  tog('other-field', v.startsWith('other'));
+}
+
+/* ── BUTTON ── */
+function refreshBtn(){
+  const btn = document.getElementById('sbtn');
+  const lbl = document.getElementById('sbtn-lbl');
+  btn.className = 'sbtn';
+  const map = {
+    'income-online':        ['inc-m',  '💰 Save online income →'],
+    'income-offline':       ['inc-m',  '💰 Save offline income →'],
+    'expense-online':       ['exp-m',  '🧾 Save online expense →'],
+    'expense-offline':      ['exp-m',  '🧾 Save offline expense →'],
+    'debt-lend-give':       ['lend-m', '💸 Gave money — save →'],
+    'debt-lend-got':        ['lend-m', '✅ Got back — save →'],
+    'debt-borrow-took':     ['bor-m',  '🤝 Took money — save →'],
+    'debt-borrow-returned': ['bor-m',  '🔄 Returned — save →'],
+  };
+  const key = cType==='debt'?`debt-${cAction}`:`${cType}-${cMode}`;
+  const [cls,txt] = map[key]||['inc-m','Save →'];
+  btn.classList.add(cls); lbl.textContent = txt;
+}
+
+/* ── HELPERS ── */
+function tog(id,show){ document.getElementById(id).classList.toggle('show',show); }
+function fmt(n){ return '₹'+Math.abs(Number(n)).toLocaleString('en-IN',{maximumFractionDigits:2}); }
+
+/* ── SUMMARY ── */
+function refreshSummary(){
+  let inc=0,exp=0,lent=0,bor=0;
+  entries.forEach(e=>{
+    if(e.type==='income') inc+=+e.amount;
+    if(e.type==='expense') exp+=+e.amount;
+    if(e.type==='debt'){
+      if(e.action==='lend-give')       lent+=+e.amount;
+      if(e.action==='lend-got')        lent-=+e.amount;
+      if(e.action==='borrow-took')     bor +=+e.amount;
+      if(e.action==='borrow-returned') bor -=+e.amount;
+    }
+  });
+  document.getElementById('sv-inc').textContent = fmt(inc);
+  document.getElementById('sv-exp').textContent = fmt(exp);
+  document.getElementById('sv-bal').textContent = fmt(inc-exp);
+  const net = lent-bor;
+  const el = document.getElementById('sv-debt');
+  el.textContent = (net>=0?'+':'−')+fmt(net);
+  el.style.color = net>=0?'var(--lend)':'var(--borrow)';
+}
+
+/* ── LOG ── */
+function addLog(e){
+  const list = document.getElementById('log-list');
+  if(entries.length===1) list.innerHTML='';
+  const div = document.createElement('div'); div.className='li';
+  const d=new Date(e.ts);
+  const ts=d.toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+  const cfg={
+    'income':              {ico:'💰',pc:'inc',   ac:'inc',    pfx:'+',  tag:`<span class="tag ${e.mode}">${e.mode}</span>`},
+    'expense':             {ico:'🧾',pc:'exp',   ac:'exp',    pfx:'−',  tag:`<span class="tag ${e.mode}">${e.mode}</span>`},
+    'debt-lend-give':      {ico:'💸',pc:'lend',  ac:'lend',   pfx:'💸', tag:`<span class="tag lend-gave">lent out</span>`},
+    'debt-lend-got':       {ico:'✅',pc:'lend',  ac:'lend',   pfx:'✅', tag:`<span class="tag lend-got">got back</span>`},
+    'debt-borrow-took':    {ico:'🤝',pc:'borrow',ac:'borrow', pfx:'🤝', tag:`<span class="tag bor-took">borrowed</span>`},
+    'debt-borrow-returned':{ico:'🔄',pc:'borrow',ac:'borrow', pfx:'🔄', tag:`<span class="tag bor-returned">returned</span>`},
+  };
+  const ck=e.type==='debt'?`debt-${e.action}`:e.type;
+  const c=cfg[ck]||{ico:'💬',pc:'inc',ac:'inc',pfx:'',tag:''};
+  const person=e.person?` · ${e.person}`:'';
+  div.innerHTML=`
+    <div class="lp ${c.pc}">${c.ico}</div>
+    <div class="li-info">
+      <div class="li-desc">${e.desc||'—'}</div>
+      <div class="li-meta">${e.source} · ${ts}${person}</div>
+    </div>
+    <div class="li-r">
+      <span class="li-amt ${c.ac}">${c.pfx} ${fmt(e.amount)}</span>
+      <div class="li-tags">${c.tag}</div>
+    </div>`;
+  list.prepend(div);
+}
+
+/* ── TOAST ── */
+function toast(msg,t='ok'){
+  const el=document.getElementById('toast');
+  el.textContent=(t==='ok'?'✓ ':'✕ ')+msg;
+  el.className=`toast ${t} show`;
+  setTimeout(()=>el.classList.remove('show'),3200);
+}
+
+/* ── SAVE ── */
+async function save(){
+  const amount = document.getElementById('amount').value.trim();
+  const desc   = document.getElementById('desc').value.trim();
+  const ts     = document.getElementById('ts').value;
+  const person = document.getElementById('person').value.trim();
+  const srcRaw = document.getElementById('src-sel').value;
+  const other  = document.getElementById('other-val').value.trim();
+  const source = srcRaw.toLowerCase().startsWith('other')?(other||srcRaw):srcRaw;
+
+  if(!amount||isNaN(amount)||+amount<=0){toast('Enter a valid amount','err');return}
+  if(!desc){toast('Description is required','err');return}
+  if(!ts){toast('Pick a date & time','err');return}
+  if(cType==='debt'&&!person){toast('Enter the person\'s name','err');return}
+  if(srcRaw.toLowerCase().startsWith('other')&&!other){toast('Please specify the source','err');return}
+
+  const entry={
+    type:cType, mode:cType!=='debt'?cMode:'',
+    flow:cType==='debt'?cFlow:'', action:cType==='debt'?cAction:'',
+    amount, desc, source, person:cType==='debt'?person:'', ts
+  };
+
+  if(APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL'){
+    entries.push(entry);
+    updateLedger(entry);
+    addLog(entry); refreshSummary();
+    onPersonInput(); // refresh panel with updated balance
+    toast('Demo mode — logged locally!'); reset(); return;
+  }
+
+  const btn=document.getElementById('sbtn'); btn.classList.add('loading');
+  try{
+    await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)});
+    entries.push(entry);
+    updateLedger(entry);
+    addLog(entry); refreshSummary();
+    toast('Saved to Google Sheets!'); reset();
+  }catch(err){toast('Could not save — check your URL','err')}
+  finally{btn.classList.remove('loading')}
+}
+
+/* ── RESET ── */
+function reset(){
+  document.getElementById('amount').value='';
+  document.getElementById('desc').value='';
+  document.getElementById('other-val').value='';
+  document.getElementById('src-sel').selectedIndex=0;
+  onSrcChange();
+  const n=new Date(); n.setMinutes(n.getMinutes()-n.getTimezoneOffset());
+  document.getElementById('ts').value=n.toISOString().slice(0,16);
+  // keep person name so user sees updated balance
+}
+</script>
+</body>
+</html>
