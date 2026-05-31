@@ -698,12 +698,29 @@ async function save(){
 
   const btn=document.getElementById('sbtn'); btn.classList.add('loading');
   try{
-    await fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)});
+    // GET request with URL params avoids CORS issues with Apps Script
+    const params = new URLSearchParams({
+      timestamp:   entry.ts,
+      type:        entry.type,
+      mode:        entry.mode,
+      flow:        entry.flow,
+      action:      entry.action,
+      amount:      entry.amount,
+      description: entry.desc,
+      source:      entry.source,
+      person:      entry.person
+    });
+    const res  = await fetch(APPS_SCRIPT_URL + '?' + params.toString());
+    const json = await res.json();
+    if(json.status === 'error') throw new Error(json.message);
     entries.push(entry);
     updateLedger(entry);
     addLog(entry); refreshSummary();
-    toast('Saved to Google Sheets!'); reset();
-  }catch(err){toast('Could not save — check your URL','err')}
+    toast('Saved to Google Sheets! ✓'); reset();
+  }catch(err){
+    toast('Error: ' + err.message, 'err');
+    console.error(err);
+  }
   finally{btn.classList.remove('loading')}
 }
 
