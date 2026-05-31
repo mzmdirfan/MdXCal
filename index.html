@@ -383,7 +383,7 @@ input::placeholder{color:var(--tx3);font-weight:500}
 <div class="toast" id="toast"></div>
 
 <script>
-const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwTHyOnLEb44dgXHsFLeZqN_dm3OhgJnQQEmEIYMcX02EA5FgTCN0To_YRtTQJbJ_I/exec';
 
 const ONLINE  = ['GPay','PhonePe','Paytm','ICICI Net Banking','HDFC Net Banking','SBI Net Banking','IOB Net Banking','TMB Net Banking','Amazon Pay','BHIM UPI','Other (online)'];
 const OFFLINE = ['Cash in hand','ICICI ATM','IOB ATM','TMB ATM','HDFC ATM','SBI ATM','Cheque','Other (offline)'];
@@ -688,7 +688,7 @@ async function save(){
     amount, desc, source, person:cType==='debt'?person:'', ts
   };
 
-  if(APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL'){
+  if(APPS_SCRIPT_URL==='https://script.google.com/macros/s/AKfycbwTHyOnLEb44dgXHsFLeZqN_dm3OhgJnQQEmEIYMcX02EA5FgTCN0To_YRtTQJbJ_I/exec'){
     entries.push(entry);
     updateLedger(entry);
     addLog(entry); refreshSummary();
