@@ -688,7 +688,7 @@ async function save(){
     amount, desc, source, person:cType==='debt'?person:'', ts
   };
 
-  if(APPS_SCRIPT_URL==='https://script.google.com/macros/s/AKfycbwTHyOnLEb44dgXHsFLeZqN_dm3OhgJnQQEmEIYMcX02EA5FgTCN0To_YRtTQJbJ_I/exec'){
+  if(APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL'){
     entries.push(entry);
     updateLedger(entry);
     addLog(entry); refreshSummary();
