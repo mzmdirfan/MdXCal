@@ -31,11 +31,65 @@ h1 em{color:var(--inc);font-style:italic}
 .notice{background:var(--gold-bg);border:1px solid #e8c97a;border-radius:var(--rs);padding:10px 14px;margin-bottom:16px;font-size:.71rem;color:var(--gold);line-height:1.6}
 .notice code{background:rgba(192,138,46,.12);padding:1px 5px;border-radius:4px;font-family:monospace}
 
-.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:16px}
-.sc{background:var(--surface);border:1.5px solid var(--bdr);border-radius:var(--rs);padding:10px 7px;text-align:center}
-.sc-l{font-size:.57rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:3px}
-.sc-v{font-family:'Lora',serif;font-size:.92rem;font-weight:600}
-#sv-bal{color:var(--inc)} #sv-inc{color:var(--inc)} #sv-exp{color:var(--exp)}
+/* ── DASHBOARD ── */
+.dashboard{margin-bottom:16px}
+
+/* Balance hero */
+.bal-hero{background:var(--surface);border:1.5px solid var(--bdr);border-radius:var(--r);padding:18px 18px 14px;margin-bottom:10px;text-align:center;box-shadow:0 2px 10px rgba(100,80,60,.07)}
+.bal-hero-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--tx3);margin-bottom:4px}
+.bal-hero-val{font-family:'Lora',serif;font-size:2rem;font-weight:600;color:var(--inc);line-height:1}
+.bal-hero-val.negative{color:var(--exp)}
+.bal-hero-sub{font-size:.7rem;color:var(--tx3);margin-top:6px;font-weight:500}
+
+/* Income / Expense row */
+.inc-exp-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.ie-card{border-radius:var(--rs);padding:13px 14px;border:1.5px solid}
+.ie-card.inc-card{background:var(--inc-bg);border-color:var(--inc-bdr)}
+.ie-card.exp-card{background:var(--exp-bg);border-color:var(--exp-bdr)}
+.ie-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.ie-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.ie-card.inc-card .ie-label{color:var(--inc)}
+.ie-card.exp-card .ie-label{color:var(--exp)}
+.ie-icon{font-size:15px}
+.ie-val{font-family:'Lora',serif;font-size:1.25rem;font-weight:600}
+.ie-card.inc-card .ie-val{color:var(--inc)}
+.ie-card.exp-card .ie-val{color:var(--exp)}
+.ie-sub{font-size:.62rem;color:var(--tx3);font-weight:500;margin-top:2px}
+
+/* Online / Offline breakdown */
+.breakdown-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.bk-item{background:rgba(255,255,255,.6);border-radius:7px;padding:5px 8px;display:flex;justify-content:space-between;align-items:center}
+.bk-lbl{font-size:.6rem;font-weight:700;color:var(--tx3)}
+.bk-val{font-family:'Lora',serif;font-size:.75rem;font-weight:600}
+.bk-val.inc{color:var(--inc)} .bk-val.exp{color:var(--exp)}
+
+/* Debt panel */
+.debt-panel{background:var(--surface);border:1.5px solid var(--bdr);border-radius:var(--rs);padding:13px 14px;box-shadow:0 1px 6px rgba(100,80,60,.06)}
+.debt-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.debt-panel-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--tx2)}
+.debt-net{font-family:'Lora',serif;font-size:.9rem;font-weight:600}
+.debt-net.owe-me{color:var(--lend)}
+.debt-net.i-owe{color:var(--borrow)}
+.debt-net.clear{color:var(--tx3)}
+.debt-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.debt-col{border-radius:8px;padding:9px 10px;border:1.5px solid}
+.debt-col.lend-col  {background:var(--lend-bg);  border-color:var(--lend-bdr)}
+.debt-col.borrow-col{background:var(--borrow-bg);border-color:var(--borrow-bdr)}
+.dc-title{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.debt-col.lend-col   .dc-title{color:var(--lend)}
+.debt-col.borrow-col .dc-title{color:var(--borrow)}
+.dc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.dc-lbl{font-size:.65rem;color:var(--tx3);font-weight:600}
+.dc-val{font-family:'Lora',serif;font-size:.78rem;font-weight:600}
+.dc-val.lend  {color:var(--lend)}
+.dc-val.borrow{color:var(--borrow)}
+.dc-divider{height:1px;background:var(--bdr);margin:4px 0}
+.dc-bal-row{display:flex;justify-content:space-between;align-items:center}
+.dc-bal-lbl{font-size:.65rem;font-weight:800;color:var(--tx)}
+.dc-bal-val{font-family:'Lora',serif;font-size:.88rem;font-weight:600}
+.dc-bal-val.lend  {color:var(--lend)}
+.dc-bal-val.borrow{color:var(--borrow)}
+.dc-bal-val.settled{color:var(--inc)}
 
 .card{background:var(--surface);border:1.5px solid var(--bdr);border-radius:var(--r);padding:20px 18px;box-shadow:0 2px 10px rgba(100,80,60,.07)}
 .ch{display:flex;align-items:center;gap:8px;margin-bottom:16px}
@@ -205,6 +259,53 @@ input::placeholder{color:var(--tx3);font-weight:500}
 
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── DASHBOARD ── */
+.dashboard{margin-bottom:16px}
+.bal-hero{background:var(--surface);border:1.5px solid var(--bdr);border-radius:var(--r);padding:18px 18px 14px;margin-bottom:10px;text-align:center;box-shadow:0 2px 10px rgba(100,80,60,.07)}
+.bal-hero-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--tx3);margin-bottom:4px}
+.bal-hero-val{font-family:'Lora',serif;font-size:2rem;font-weight:600;color:var(--inc);line-height:1}
+.bal-hero-val.negative{color:var(--exp)}
+.bal-hero-sub{font-size:.7rem;color:var(--tx3);margin-top:6px;font-weight:500}
+.inc-exp-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.ie-card{border-radius:var(--rs);padding:13px 14px;border:1.5px solid}
+.ie-card.inc-card{background:var(--inc-bg);border-color:var(--inc-bdr)}
+.ie-card.exp-card{background:var(--exp-bg);border-color:var(--exp-bdr)}
+.ie-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.ie-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.ie-card.inc-card .ie-label{color:var(--inc)}
+.ie-card.exp-card .ie-label{color:var(--exp)}
+.ie-icon{font-size:15px}
+.ie-val{font-family:'Lora',serif;font-size:1.25rem;font-weight:600}
+.ie-card.inc-card .ie-val{color:var(--inc)}
+.ie-card.exp-card .ie-val{color:var(--exp)}
+.ie-sub{font-size:.62rem;color:var(--tx3);font-weight:500;margin-top:2px}
+.breakdown-row{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.bk-item{background:rgba(255,255,255,.6);border-radius:7px;padding:5px 7px;display:flex;justify-content:space-between;align-items:center}
+.bk-lbl{font-size:.59rem;font-weight:700;color:var(--tx3)}
+.bk-val{font-family:'Lora',serif;font-size:.74rem;font-weight:600}
+.bk-val.inc{color:var(--inc)} .bk-val.exp{color:var(--exp)}
+.debt-panel{background:var(--surface);border:1.5px solid var(--bdr);border-radius:var(--rs);padding:13px 14px;box-shadow:0 1px 6px rgba(100,80,60,.06)}
+.debt-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.debt-panel-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--tx2)}
+.debt-net{font-family:'Lora',serif;font-size:.88rem;font-weight:600}
+.debt-net.owe-me{color:var(--lend)} .debt-net.i-owe{color:var(--borrow)} .debt-net.clear{color:var(--tx3)}
+.debt-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.debt-col{border-radius:8px;padding:9px 10px;border:1.5px solid}
+.debt-col.lend-col{background:var(--lend-bg);border-color:var(--lend-bdr)}
+.debt-col.borrow-col{background:var(--borrow-bg);border-color:var(--borrow-bdr)}
+.dc-title{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.debt-col.lend-col .dc-title{color:var(--lend)}
+.debt-col.borrow-col .dc-title{color:var(--borrow)}
+.dc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.dc-lbl{font-size:.64rem;color:var(--tx3);font-weight:600}
+.dc-val{font-family:'Lora',serif;font-size:.78rem;font-weight:600}
+.dc-val.lend{color:var(--lend)} .dc-val.borrow{color:var(--borrow)}
+.dc-divider{height:1px;background:var(--bdr);margin:5px 0}
+.dc-bal-row{display:flex;justify-content:space-between;align-items:center}
+.dc-bal-lbl{font-size:.65rem;font-weight:800;color:var(--tx)}
+.dc-bal-val{font-family:'Lora',serif;font-size:.9rem;font-weight:600}
+.dc-bal-val.lend{color:var(--lend)} .dc-bal-val.borrow{color:var(--borrow)} .dc-bal-val.settled{color:var(--inc)}
 </style>
 </head>
 <body>
@@ -220,11 +321,103 @@ input::placeholder{color:var(--tx3);font-weight:500}
   <strong>⚙ Setup:</strong> Replace <code>YOUR_APPS_SCRIPT_URL</code> with your Google Apps Script Web App URL. See <code>appsscript.gs</code> for step-by-step instructions.
 </div>
 
-<div class="summary">
-  <div class="sc"><div class="sc-l">Balance</div><div class="sc-v" id="sv-bal">₹0</div></div>
-  <div class="sc"><div class="sc-l">Income</div> <div class="sc-v" id="sv-inc">₹0</div></div>
-  <div class="sc"><div class="sc-l">Expense</div><div class="sc-v" id="sv-exp">₹0</div></div>
-  <div class="sc"><div class="sc-l">Net Debt</div><div class="sc-v" id="sv-debt">₹0</div></div>
+<div class="dashboard">
+
+  <!-- BALANCE HERO -->
+  <div class="bal-hero">
+    <div class="bal-hero-label">Current Balance</div>
+    <div class="bal-hero-val" id="sv-bal">₹0</div>
+    <div class="bal-hero-sub" id="sv-bal-sub">No transactions yet</div>
+  </div>
+
+  <!-- INCOME / EXPENSE CARDS -->
+  <div class="inc-exp-row">
+    <div class="ie-card inc-card">
+      <div class="ie-top">
+        <span class="ie-label">Income</span>
+        <span class="ie-icon">💰</span>
+      </div>
+      <div class="ie-val" id="sv-inc">₹0</div>
+      <div class="ie-sub" id="sv-inc-sub">—</div>
+      <div class="breakdown-row">
+        <div class="bk-item">
+          <span class="bk-lbl">📲 Online</span>
+          <span class="bk-val inc" id="sv-inc-onl">₹0</span>
+        </div>
+        <div class="bk-item">
+          <span class="bk-lbl">💵 Offline</span>
+          <span class="bk-val inc" id="sv-inc-off">₹0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ie-card exp-card">
+      <div class="ie-top">
+        <span class="ie-label">Expense</span>
+        <span class="ie-icon">🧾</span>
+      </div>
+      <div class="ie-val" id="sv-exp">₹0</div>
+      <div class="ie-sub" id="sv-exp-sub">—</div>
+      <div class="breakdown-row">
+        <div class="bk-item">
+          <span class="bk-lbl">📲 Online</span>
+          <span class="bk-val exp" id="sv-exp-onl">₹0</span>
+        </div>
+        <div class="bk-item">
+          <span class="bk-lbl">💵 Offline</span>
+          <span class="bk-val exp" id="sv-exp-off">₹0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEBT PANEL -->
+  <div class="debt-panel">
+    <div class="debt-panel-head">
+      <span class="debt-panel-title">⇄ Debt Overview</span>
+      <span class="debt-net clear" id="sv-debt-net">₹0</span>
+    </div>
+    <div class="debt-cols">
+
+      <!-- LEND column -->
+      <div class="debt-col lend-col">
+        <div class="dc-title">🫴 I Lent</div>
+        <div class="dc-row">
+          <span class="dc-lbl">Given out</span>
+          <span class="dc-val lend" id="sv-lent-given">₹0</span>
+        </div>
+        <div class="dc-row">
+          <span class="dc-lbl">Got back</span>
+          <span class="dc-val lend" id="sv-lent-got">₹0</span>
+        </div>
+        <div class="dc-divider"></div>
+        <div class="dc-bal-row">
+          <span class="dc-bal-lbl">Pending</span>
+          <span class="dc-bal-val lend" id="sv-lent-bal">₹0</span>
+        </div>
+      </div>
+
+      <!-- BORROW column -->
+      <div class="debt-col borrow-col">
+        <div class="dc-title">🤲 I Borrowed</div>
+        <div class="dc-row">
+          <span class="dc-lbl">Took</span>
+          <span class="dc-val borrow" id="sv-bor-took">₹0</span>
+        </div>
+        <div class="dc-row">
+          <span class="dc-lbl">Returned</span>
+          <span class="dc-val borrow" id="sv-bor-ret">₹0</span>
+        </div>
+        <div class="dc-divider"></div>
+        <div class="dc-bal-row">
+          <span class="dc-bal-lbl">Still owe</span>
+          <span class="dc-bal-val borrow" id="sv-bor-bal">₹0</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <div class="card">
@@ -607,24 +800,87 @@ function fmt(n){ return '₹'+Math.abs(Number(n)).toLocaleString('en-IN',{maximu
 
 /* ── SUMMARY ── */
 function refreshSummary(){
-  let inc=0,exp=0,lent=0,bor=0;
+  let inc=0, exp=0;
+  let incOnl=0, incOff=0, expOnl=0, expOff=0;
+  let incCount=0, expCount=0;
+  let lentGiven=0, lentGot=0, borTook=0, borRet=0;
+
   entries.forEach(e=>{
-    if(e.type==='income') inc+=+e.amount;
-    if(e.type==='expense') exp+=+e.amount;
+    if(e.type==='income'){
+      inc += +e.amount; incCount++;
+      if(e.mode==='online')  incOnl += +e.amount;
+      else                   incOff += +e.amount;
+    }
+    if(e.type==='expense'){
+      exp += +e.amount; expCount++;
+      if(e.mode==='online')  expOnl += +e.amount;
+      else                   expOff += +e.amount;
+    }
     if(e.type==='debt'){
-      if(e.action==='lend-give')       lent+=+e.amount;
-      if(e.action==='lend-got')        lent-=+e.amount;
-      if(e.action==='borrow-took')     bor +=+e.amount;
-      if(e.action==='borrow-returned') bor -=+e.amount;
+      if(e.action==='lend-give')        lentGiven += +e.amount;
+      if(e.action==='lend-got')         lentGot   += +e.amount;
+      if(e.action==='borrow-took')      borTook   += +e.amount;
+      if(e.action==='borrow-returned')  borRet    += +e.amount;
     }
   });
-  document.getElementById('sv-inc').textContent = fmt(inc);
-  document.getElementById('sv-exp').textContent = fmt(exp);
-  document.getElementById('sv-bal').textContent = fmt(inc-exp);
-  const net = lent-bor;
-  const el = document.getElementById('sv-debt');
-  el.textContent = (net>=0?'+':'−')+fmt(net);
-  el.style.color = net>=0?'var(--lend)':'var(--borrow)';
+
+  const balance   = inc - exp;
+  const lentBal   = Math.max(0, lentGiven - lentGot);
+  const borBal    = Math.max(0, borTook   - borRet);
+  const netDebt   = lentBal - borBal;
+
+  // Balance hero
+  const balEl = document.getElementById('sv-bal');
+  balEl.textContent = fmt(balance);
+  balEl.className = 'bal-hero-val' + (balance < 0 ? ' negative' : '');
+  const subEl = document.getElementById('sv-bal-sub');
+  if(incCount===0 && expCount===0){
+    subEl.textContent = 'No transactions yet';
+  } else {
+    const pct = inc > 0 ? Math.round((exp/inc)*100) : 0;
+    subEl.textContent = `Spent ${pct}% of income · ${incCount+expCount} transactions`;
+  }
+
+  // Income card
+  document.getElementById('sv-inc').textContent     = fmt(inc);
+  document.getElementById('sv-inc-onl').textContent = fmt(incOnl);
+  document.getElementById('sv-inc-off').textContent = fmt(incOff);
+  document.getElementById('sv-inc-sub').textContent = incCount > 0 ? incCount+' entries' : '—';
+
+  // Expense card
+  document.getElementById('sv-exp').textContent     = fmt(exp);
+  document.getElementById('sv-exp-onl').textContent = fmt(expOnl);
+  document.getElementById('sv-exp-off').textContent = fmt(expOff);
+  document.getElementById('sv-exp-sub').textContent = expCount > 0 ? expCount+' entries' : '—';
+
+  // Debt panel
+  document.getElementById('sv-lent-given').textContent = fmt(lentGiven);
+  document.getElementById('sv-lent-got').textContent   = fmt(lentGot);
+  document.getElementById('sv-bor-took').textContent   = fmt(borTook);
+  document.getElementById('sv-bor-ret').textContent    = fmt(borRet);
+
+  // Lend balance
+  const lbEl = document.getElementById('sv-lent-bal');
+  lbEl.textContent = lentBal===0 && lentGiven>0 ? '✓ All back' : fmt(lentBal);
+  lbEl.className   = lentBal===0 && lentGiven>0 ? 'dc-bal-val settled' : 'dc-bal-val lend';
+
+  // Borrow balance
+  const bbEl = document.getElementById('sv-bor-bal');
+  bbEl.textContent = borBal===0 && borTook>0 ? '✓ Cleared' : fmt(borBal);
+  bbEl.className   = borBal===0 && borTook>0 ? 'dc-bal-val settled' : 'dc-bal-val borrow';
+
+  // Net debt label
+  const ndEl = document.getElementById('sv-debt-net');
+  if(netDebt > 0){
+    ndEl.textContent = fmt(netDebt)+' owed to you';
+    ndEl.className   = 'debt-net owe-me';
+  } else if(netDebt < 0){
+    ndEl.textContent = fmt(netDebt)+' you owe';
+    ndEl.className   = 'debt-net i-owe';
+  } else {
+    ndEl.textContent = 'All clear';
+    ndEl.className   = 'debt-net clear';
+  }
 }
 
 /* ── LOG ── */
